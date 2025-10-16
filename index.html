@@ -1,8 +1,7 @@
 <head><meta charset="UTF-8"><script src="cookie.js"></script></head>
 <script>
   let b=getCookie("lastB");
-  if(isNaN(b)){b="大院里的小叶子"}
-  let c=getCookie("lastC");
-  if(isNaN(c)){c=1}else{c=Number(c)}
+  if(String(b)==null){b="大院里的小叶子"}
+  let c=Number(getCookie("lastC"));
   location.href="/read.html?b="+b+"&c="+c
 </script>
