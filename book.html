@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/_css/style.css" />
+  <script src="/_js/styleFit.js"></script>
+  <title>-味界一梦wjym.windwhir.top</title>
+</head>
+<body>
+  <div id="reader">
+    <div id="content" style="overflow: auto;word-wrap: break-word;">
+      <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" onclick="location.href='/home.html'"/>味界一梦：</b>
+      <h1></h1>
+      <div id="lastRead">
+        <hr/>
+        <div class="bars">
+          <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读</b>
+          <hr/>
+          <div><a href="javascript:turnTo(lastC)"><span id="lastReadGo"></span><br/>继续阅读&gt;</a></div>
+        </div>
+      </div>
+      <div class="bars">
+        <a href="javascript:turnTo(1)">从头开始阅读</a>
+        <input type="text" placeholder="输入数字直接转跳" style="font-size: 2rem;width:100%;border-radius:10px;background-color: var(--bg-color);transition:var(--transition);" onblur="turnTo(Number(document.querySelector('input').value))"/>
+      </div>
+      <div class="bars" id="text0" style="word-wrap: break-word;white-space: pre-wrap;">
+        简介(Loading)
+      </div>
+      <div class="bars">
+        <a href="javascript:menuUp()">向上加载</a><hr/>
+        <div id="menuList"></div>
+        <a href="javascript:menuDown()">向下加载</a><br/>
+      </div>
+    </div>
+  </div>
+  
+  <div class="chapter-bar">
+    <div class="chapter-item turnLeft" onclick="location.href='/home.html'"><a title="回到主页" class="chapter-button">H</a></div>
+    <div class="chapter-item turnRight" onclick="turnTo(lastC)"><a title="回到阅读" class="chapter-button">◷</a></div>
+  </div>
+  
+  <script>
+    //初始化
+    styleFit.all();
+    localStorage.setItem("lastPage",location.pathname+location.search);
+    //读取bookname
+    function urlrel(release){let params=new URLSearchParams(window.location.href.split('?')[1]);return params.get(release);}
+    const bookname=urlrel("b")||"bug!";
+    document.querySelector("title").innerHTML=bookname+document.querySelector("title").innerHTML;
+    document.querySelector("h1").innerHTML=bookname;
+    //上次阅读
+    var lastC=Number(localStorage.getItem(bookname));
+    if(lastC < 1 ){document.querySelector("#lastRead").style.display="none";document.querySelector(".turnRight a").innerHTML="&gt;";lastC=1}
+    function turnTo(num){
+      localStorage.setItem(bookname,num);
+      location.href="/text.html?b="+bookname;
+    }
+    //简介
+    fetch('/'+bookname+'/0.txt')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`txt coding: HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(text => {
+        document.getElementById('text0').textContent = text;
+      })
+      .catch(error => {
+        window.top.hint("<b>文件读取错误</b>\n"+error);
+        console.error('文件读取错误', error);
+      });
+      //menu追加
+      var menuNum=lastC<5?[1,10]:[lastC-4,lastC+5]
+      function startMenu(){
+        const menuList=document.querySelector("#menuList");
+        menuList.innerHTML="";
+        for(let i=menuNum[0];i<=menuNum[1];i++){
+          if(menu[i]){
+            let newA=document.createElement("a");
+            newA.href=`javascript:turnTo(${i})`;
+            newA.innerHTML=menu[i]+"<hr/>";
+            menuList.appendChild(newA)
+          }
+        }
+      }
+      function menuUp(){
+        menuNum[0]-=10;
+        if(menuNum[0]<1){menuNum[0]=1}
+        startMenu();
+      }
+      function menuDown(){
+        menuNum[1]+=10;
+        startMenu();
+      }
+      //目录处理
+      window.top.postMessage({loadMenu:bookname});
+      window.addEventListener("message",(event)=>{
+        if(event.origin!=location.origin)throw new Error("通信非同源");
+        if(event.data.menuLoaded==bookname)menuGot();
+      })
+      var menu=null;
+      function menuGot(){
+        menu=window.top.menu;
+        document.querySelector("#lastReadGo").innerHTML=menu[lastC];
+        startMenu();
+      }
+  </script>
+</body>
+</html>

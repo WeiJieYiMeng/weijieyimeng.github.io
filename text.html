@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/_css/style.css" />
+  <script src="/_js/styleFit.js"></script>
+  <title>-味界一梦wjym.windwhir.top</title>
+  <style>
+    .chapter-bar-small{
+      display:flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 80%;
+      line-height: 1;
+    }
+    .chapter-bar-small>a{
+      text-align: center;
+    }
+    a.turnLeft-small::after{
+      content: var(--turnLeft-property);
+      font-size: 50%;
+      line-height: 1;
+      }
+    a.turnRight-small::after{
+      content: var(--turnRight-property);
+      font-size: 50%;
+      line-height: 1;
+    }
+    #content{
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <div id="reader">
+    <div id="content" style="overflow: auto;word-wrap: break-word;white-space: pre-wrap;"><img src="/favicon.png" id="icon" style="width: 1.8rem;height: 1.8rem;" onclick="turnTo('menu')"/><span id="contentin">无法载入数据。
+请从规范方式进入阅读。
+<a href="/home.html">点击回到主页</a>
+<a href="javascript:turnTo('menu')">点击回到目录页(若书名正常)</a>
+</span><a href="#icon" id="backTop" style="opacity: 0.02;">回到顶部</a>
+<hr/><br/><div class="chapter-bar-small">
+<a class="turnLeft-small" onclick="turnTo(lastC - 1)" style="text-align:left">&lt;上一章<br/></a>
+<a class="turnRight-small" onclick="turnTo(lastC + 1)" style="text-align:right">下一章&gt;<br/></a>
+</div></div>
+  </div>
+
+  <div class="chapter-bar" style="transform: translateY(-25%);">
+    <div class="chapter-item turnLeft"><a title="回到目录" class="chapter-button"  onclick="turnTo('menu')">M</a><a title="上一章" class="chapter-button"  onclick="turnTo(lastC - 1)">&lt;</a></div>
+    <div class="chapter-item turnRight" onclick="turnTo(lastC + 1)"><a title="下一章" class="chapter-button">&gt;</a></div>
+  </div>
+  
+  <script>
+    //初始化
+    styleFit.all();
+    localStorage.setItem("lastPage",location.pathname+location.search);
+    //读取bookname
+    function urlrel(release){let params=new URLSearchParams(window.location.href.split('?')[1]);return params.get(release);}
+    const bookname=urlrel("b")||"bug!";
+    document.querySelector("title").innerHTML=bookname+document.querySelector("title").innerHTML;
+    //上次阅读
+    var lastC=Number(localStorage.getItem(bookname));
+    if(lastC < 1 ){document.querySelector("#lastRead").style.display="none";document.querySelector(".turnRight a").innerHTML="&gt;";lastC=1}
+    //turnTo
+    function turnTo(num){
+      if(num=="menu"){location.href="/book.html?b="+bookname;return 0;}
+      lastC=num;
+      getText(num);
+      getMenu(num);
+      document.querySelector("#backTop").click();
+    }
+    //获取文本
+    function getText(num){
+      fetch('/'+bookname+'/'+num+'.txt')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`txt coding: HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
+        .then(text => {
+          document.querySelector("#contentin").textContent = text;
+          localStorage.setItem(bookname,num);
+          localStorage.setItem("lastB",bookname);
+        })
+        .catch(error => {
+          window.top.hint("<b>文件读取错误</b>\n"+error);
+          console.error('文件读取错误', error);
+        });
+    }
+    getText(lastC)
+    //目录处理
+    window.top.postMessage({loadMenu:bookname});
+    window.addEventListener("message",(event)=>{
+      if(event.origin!=location.origin)throw new Error("通信非同源");
+      if(event.data.menuLoaded==bookname)menuGot();
+    })
+    var menu=null;
+    function menuGot(){
+      menu=window.top.menu;
+      getMenu()
+    }
+    var firstGetMenu=0;
+    function getMenu(){
+      let leftC=menu[lastC - 1]||"已是第一章节";
+      let rightC=menu[lastC + 1]||"已是最后一章";
+      document.documentElement.style.setProperty('--turnLeft-property', `"${leftC}"`);
+      document.documentElement.style.setProperty('--turnRight-property', `"${rightC}"`);
+      if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到目录")},3150)}
+    }
+  </script>
+</body>
+</html>

@@ -1,5 +1,288 @@
-<head><meta charset="UTF-8"><script src="cookie.js"></script></head>
-<script>
-  let c=Number(getCookie("lastC"));
-  location.href="/read.html?b=大院里的小叶子&c="+c
-</script>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/_css/style.css" />
+  <link rel="favicon" href="/favicon.png" />
+  <link rel="icon" href="/favicon.png" />
+  <title>味界一梦wjym.windwhir.top</title>
+  <style>
+    .control-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--control-bg);
+      color: var(--control-color);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      line-height: 1.1;
+      transition: var(--transition);
+    }
+    .btn-group { gap: 0.5rem; }
+    .btn {
+      background: none;
+      border: none;
+      color: var(--control-color);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    .btn span{font-size: 50%;}
+    .btn:hover {background: rgba(255,255,255,0.1); }
+    main {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0rem 0rem 4rem;
+      overflow: hidden;
+    }
+    iframe , #fullScreenDiv{
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    #hint-box{
+      position: absolute;
+      z-index: 1001;
+      display: flex;
+      justify-content: center;
+      top: 0;
+      width:100%;
+      transform: translateY(calc(-100% - 1rem));
+      font-size: 180%;
+      transition: var(--transition);
+    }
+    #hint{
+      border: solid 1px #aaa;
+      border-radius: 0.6rem;
+      background: rgba(30,30,30,0.9);
+      color: var(--control-color);
+      padding: 0.5rem 1rem;
+      white-space: pre-wrap;
+      text-align: center;
+    }
+    b{
+      display: inline;
+      color:#f00;
+    }
+    @media (max-width: 768px) {
+      .control-bar { padding: 0.75rem; }
+      main {padding: 0rem 0rem 3.25rem;}
+    }
+    @media (max-width: 480px) {
+      .btn-group { gap: 0.25rem; }
+      .btn { font-size: 0.8rem;padding: 0.24rem 0.3rem}
+    }
+    @media (max-width: 320px) {
+      .btn-group { gap: 0.1rem; }
+      .btn { font-size: 0.6rem;padding: 0.25rem 0.2rem;}
+    }
+    @media (min-width: 942px) {
+      .chapterAlways{display:none}
+      .historyBack{display:inline !important}
+    }
+  </style>
+</head>
+<body>
+  <div class="control-bar">
+    <div class="btn-group">
+      <button class="btn fontSize" title="调整字号">A<span>16</span></button>
+      <button class="btn lineHeight" title="调整行距">↕<span>1.1</span></button>
+      <button class="btn paddingMode" title="边框模式">边</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn listenStart" title="开始收听" >▶</button>
+      <button class="btn listenSpeed" style="display:none" title="收听速度">1x</button>
+      <button class="btn listenStop" style="display: none;" title="停止收听">■</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn historyBack" style="display:none" title="回溯">‌↶</button>
+      <button class="btn chapterAlways" title="强制显示切换键">⚐</button>
+      <button class="btn darkMode" title="深浅切换">☽</button>
+      <button class="btn fullScreen" title="全屏模式">◱</button>
+    </div>
+  </div>
+  <main>
+    <div id="fullScreenDiv">
+      <iframe>
+      </iframe>
+      <div id="hint-box">
+        <div id="int-inside">
+          <div id="hint">提示框</div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    
+    //弹出提示
+    var backTimeOut;
+    function hint(prom){
+      const hintBox=document.querySelector("#hint-box");
+      const hint=document.querySelector("#hint");
+      hint.innerHTML=prom;
+      hintBox.style.transform="translateY(1rem)";
+      clearTimeout(backTimeOut);
+      backTimeOut = setTimeout(()=>{hintBox.style.transform="translateY(calc(-100% - 1rem))";},3000)
+    }
+    //easy&iframe
+    const iframeWindow=document.querySelector("iframe").contentWindow;
+    function iframePost(message){
+      iframeWindow.postMessage(message,location.origin)
+    }
+    function eve(query,handler){
+      document.querySelector(query).addEventListener('click',handler);
+    }
+    //字号调节
+    var customFontSize = JSON.parse( localStorage.getItem("fontSize") || 16);
+    document.querySelector(".fontSize span").innerHTML=customFontSize;
+    function btnFontSize(){
+      let inputFontSize = Number(prompt("请输入目标字号(px)",customFontSize));
+      if (Number.isFinite(inputFontSize) && inputFontSize > 0) {customFontSize = inputFontSize;}else{hint("<b>设置失败</b>\n若无输入错误，可能是遭到浏览器拦截。");throw new Error("btnFontSize: prompt cancel")}
+      localStorage.setItem("fontSize",customFontSize)
+      document.querySelector(".fontSize span").innerHTML=customFontSize;
+      iframePost({styleFit:"fontSize"})
+    }
+    eve(".fontSize",btnFontSize);
+    //行距调节
+    let customLineHeight = JSON.parse( localStorage.getItem("lineHeight") || 1.3);
+    document.querySelector(".lineHeight span").innerHTML=customLineHeight;
+    function btnLineHeight(){
+      let inputLineHeight = Number(prompt("请输入目标行距(倍)",customLineHeight));
+      if (Number.isFinite(inputLineHeight) && inputLineHeight > 0) {customLineHeight = inputLineHeight;}else{hint("<b>设置失败</b>\n若无输入错误，可能是遭到浏览器拦截。");throw new Error("btnLineHeight: prompt cancel")}
+      localStorage.setItem("lineHeight",customLineHeight)
+      document.querySelector(".lineHeight span").innerHTML=customLineHeight;
+      iframePost({styleFit:"lineHeight"})
+    }
+    eve(".lineHeight",btnLineHeight)
+    //边框模式 1全 2去外 3去内 4无
+    function uiPaddingMode(num){
+      switch(num%4){
+        case 1:return "⚀";
+        case 2:return "⚁";
+        case 3:return "⚂";
+        case 0:return "⚃";
+      }
+    }
+    var numPaddingMode= localStorage.getItem("paddingMode");
+    if(numPaddingMode===null){
+      numPaddingMode=4;
+      const cW=document.querySelector("html").clientWidth;
+      if(cW>=480)numPaddingMode-=2;
+      if(cW>=768)numPaddingMode-=1;
+      localStorage.setItem("paddingMode", numPaddingMode%4 );
+      hint("根据您的设备宽度\n边框模式初始为："+uiPaddingMode(numPaddingMode));
+      iframeWindow.location.reload();
+    }else{
+      numPaddingMode=Number(numPaddingMode)
+    }
+    document.querySelector(".paddingMode").innerHTML=uiPaddingMode(numPaddingMode);
+    function btnPaddingMode(){
+      numPaddingMode+=1;
+      document.querySelector(".paddingMode").innerHTML=uiPaddingMode(numPaddingMode);
+      localStorage.setItem("paddingMode", numPaddingMode%4 );
+      iframePost({styleFit:"paddingMode"});
+    }
+    eve(".paddingMode",btnPaddingMode);
+    //返回选项
+    function btnHistoryBack(){
+      if(iframeWindow.location.pathname!=="/home.html"){
+        iframeWindow.history.back();
+      }else{
+        hint("您已处于主页")
+      }
+    }
+    eve(".historyBack",btnHistoryBack);
+    //强制显示切换键
+    var isChapterAlways= JSON.parse(localStorage.getItem("chapterAlways")) === true;
+    function btnChapterAlways(){
+      isChapterAlways = !isChapterAlways;
+      localStorage.setItem("chapterAlways",isChapterAlways)
+      iframePost({styleFit:"chapterAlways"})
+    }
+    eve(".chapterAlways",btnChapterAlways);
+    //深色模式
+    var isDarkMode= JSON.parse(localStorage.getItem("darkMode")) === true;
+    if(isDarkMode){document.body.classList.add('dark-mode')};
+    function btnDarkMode() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('dark-mode', isDarkMode);
+      localStorage.setItem("darkMode",isDarkMode)
+      iframePost({styleFit:"darkMode"})
+    }
+    eve(".darkMode",btnDarkMode);
+    //全屏实现
+    function fullScreen(){
+      if(document.fullscreenElement){document.exitFullscreen();}else{document.querySelector("#fullScreenDiv").requestFullscreen();};
+    }
+    eve(".fullScreen",fullScreen)
+    function onFullScreenChange(){
+      if(document.fullscreenElement){hint("全屏模式\nEsc\/F11\/长按以退出全屏")}else{hint("退出全屏")}
+    }
+    document.addEventListener("fullscreenchange",onFullScreenChange)
+    //收听与停止
+    var isListening=0;
+    function btnListenStart(){
+      return hint("收听暂未开放") ;
+      // if(iframeWindow.location.pathname.indexOf("text")<0){return hint("仅可收听文章页")}
+      // if(!('speechSynthesis' in window)){return hint("浏览器不支持朗读\n建议更换FireFox(火狐)")}
+      // if (!speechSynthesis.getVoices().length) {hint("请授予浏览器\n语音权限")}
+      // isListening=1;
+      // return hint("已调用阅读，请稍侯")
+    }
+    eve(".listenStart",btnListenStart)
+    // eve(".listenSpeed",btnListenSpeed)
+    // eve(".listenStop",btnListenStop)
+    //监听消息
+    window.addEventListener("message",(event)=>{
+      if(event.origin!=location.origin)throw new Error("通信非同源");
+      if(event.data.loadMenu)loadMenu(event.data.loadMenu);
+      if(event.data.readText)readText(event.data.readText);
+    })
+    window.addEventListener('error', (event)=>{
+      hint(event.message);
+    })
+    //载入iframe
+    if(localStorage.getItem("lastPage") === null || localStorage.getItem("lastPage") === "/home.html"){
+      document.querySelector("iframe").src="/home.html"
+    }else{
+      document.querySelector("iframe").src=localStorage.getItem("lastPage");
+      hint("<span onclick=\"iframeWindow.location.href=\'\/home.html\'\">已根据记忆恢复\n点此回到主页</span>")
+    }
+    //读取目录
+    var menu=null;
+    var menuB=null;
+    function loadMenu(bookname){
+      if(bookname==menuB){iframePost({menuLoaded:menuB})}
+      fetch("/"+bookname+"/menu.js")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
+        .then(text => {
+          try{eval(text);}catch{throw new Error("无法编译目录");}
+          return menu;
+        })
+        .then(menu =>{
+          menuB=bookname;
+          iframePost({menuLoaded:menuB})
+        })
+        .catch(error => {
+          hint("<b>目录读取错误</b>\n"+error);
+          console.error('目录读取错误', error);
+        });
+    }
+  </script>
+</body>
+</html>

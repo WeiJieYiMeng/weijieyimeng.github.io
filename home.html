@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/_css/style.css" />
+  <script src="/_js/styleFit.js"></script>
+  <title>主页-味界一梦wjym.windwhir.top</title>
+</head>
+<body>
+  <div id="reader">
+    <div id="content" style="overflow: auto;word-wrap: break-word;/*white-space: pre-wrap;*/">
+<!--  
+      <div>
+        <a href="/world.html">转跳world</a>
+        <a href="/book.html">转跳book</a>
+        <a href="/text.html">转跳text</a>
+        <a href="javascript:location.reload()">🔄</a>
+      </div>
+      -->
+      <hr/>
+      <h1 style="width:100%;text-align: center;padding:1.3rem 0 1rem"><img src="/favicon.png" style="width: 3rem;height: 3rem;" />味界一梦</h1>
+      <div style="width:100%;text-align: center;">系列小说 / <a href="/world/index.html">世界观&gt;</a></div>
+      <div style="width:100%;text-align: center;font-size: 70%;padding:0.5rem 0 1rem">笔者: 豆福</div>
+      <hr/>
+      <div id="lastRead">
+        <div class="bars">
+          <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读</b>
+          <hr/>
+          <div><a href="javascript:lastRead()"><span id="lastReadGo"></span><br/>继续阅读&gt;</a></div>
+        </div>
+        <hr/>
+      </div>
+      <div id="books">
+      </div>
+      <hr/>
+      <div style="width:100%;text-align: center;font-size: 50%;padding:1rem 0 0.3rem">笔者: 豆福 3287195988@qq.com<br/>技术支持: 风吹呼呼 windwhir@163.com</div>
+    </div>
+  </div>
+  
+  <div class="chapter-bar">
+    <div class="chapter-item turnLeft"></div>
+    <div class="chapter-item turnRight" onclick="lastRead()"><a title="上次阅读" class="chapter-button">◷</a></div>
+  </div>
+  
+  <script>
+    books=[
+    {
+      book:"大院里的小叶子",
+      nation:"月荫",
+      char:"叶子(林叶芷),张读,豆腐大院",
+      tab:"【无刀x孩子x成长x单女主】"
+    },
+    {
+      book:"藻荇交横",
+      nation:"炎炼",
+      char:"藻,荇,枣",
+      tab:"__未开放__<br/>【小刀x孩子x衡水中学式系统】"
+    },
+    {
+      book:"宁静致远",
+      nation:"燕兰,月荫",
+      char:"陈宁,林叶静,张訢",
+      tab:"__未开放__<br/>【小刀x亡国公主x政治与恋爱x成长】"
+    },
+    {
+      book:"小葱豆腐",
+      nation:"月荫,人界系",
+      char:"张读,李晓聪,张锦儿,张訢,豆腐大院",
+      tab:"__未开放__<br/>【前期巨甜后期巨刀x单女主x世界观】"
+    },
+    // {
+    //   book:"",
+    //   nation:"",
+    //   char:"",
+    //   tab:""
+    // },
+    ]
+  </script>
+  
+  <script>
+    styleFit.all();
+    localStorage.setItem("lastPage",location.pathname);
+    const lastB=localStorage.getItem("lastB");
+    if(lastB === null){document.querySelector("#lastRead").style.display=document.querySelector(".turnRight").style.display ="none"}
+    else{document.querySelector("#lastReadGo").innerHTML=lastB+"("+localStorage.getItem(lastB)+"页)"}
+    function lastRead(){
+      location.href=`/text.html?b=${lastB}`
+    }
+    function appendBook(){
+      for(let i=0;i<books.length;i++){
+        let newBar=document.createElement("div");
+        let book=books[i].book;
+        let inHtml=`<b onclick=\"location.href=\'\/book.html?b=${book}\'\">${book}</b><hr/><div style="font-size:70%">${books[i].nation} | ${books[i].char}<br/>${books[i].tab}<a href=\"javascript:location.href=`;
+        if(localStorage.getItem(book) === null){inHtml+=`\'\/book.html?b=${book}\'\"><br/>开始阅读&gt;</a></div>`}else{inHtml+=`\'\/text.html?b=${book}\'\"><br/>上次读到${localStorage.getItem(book)}页 继续阅读&gt;</a></div>`}
+        newBar.className="bars";
+        newBar.innerHTML=inHtml;
+        document.querySelector("#books").appendChild(newBar);
+      }
+    }
+    window.onload=appendBook();
+  </script>
+</body>
+</html>
