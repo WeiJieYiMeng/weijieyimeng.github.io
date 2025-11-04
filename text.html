@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/_css/style.css" />
-  <script src="/_js/styleFit.js"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/styleFit.js"></script>
   <title>-味界一梦wjym.windwhir.top</title>
   <style>
     .chapter-bar-small{
@@ -27,18 +27,19 @@
       font-size: 50%;
       line-height: 1;
     }
-    #content{
+    .content{
       scroll-behavior: smooth;
     }
   </style>
 </head>
 <body>
-  <div id="reader">
-    <div id="content" style="overflow: auto;word-wrap: break-word;white-space: pre-wrap;"><img src="/favicon.png" id="icon" style="width: 1.8rem;height: 1.8rem;" onclick="turnTo('menu')"/><span id="contentin">无法载入数据。
+  <div class="reader">
+    <div class="content" style="overflow: auto;word-wrap: break-word;white-space: pre-wrap;"><img src="/favicon.png" id="icon" style="width: 1.8rem;height: 1.8rem;" onclick="turnTo('menu')"/><span id="contentin">无法载入数据。
 请从规范方式进入阅读。
 <a href="/home.html">点击回到主页</a>
 <a href="javascript:turnTo('menu')">点击回到目录页(若书名正常)</a>
-</span><a href="#icon" id="backTop" style="opacity: 0.02;">回到顶部</a>
+</span>
+<a href="#icon" id="backTop" style="opacity: 0.02;">回到顶部↑</a>
 <hr/><br/><div class="chapter-bar-small">
 <a class="turnLeft-small" onclick="turnTo(lastC - 1)" style="text-align:left">&lt;上一章<br/></a>
 <a class="turnRight-small" onclick="turnTo(lastC + 1)" style="text-align:right">下一章&gt;<br/></a>

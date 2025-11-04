@@ -1,0 +1,107 @@
+:root {
+  --font-size: 16px;
+  --line-height: 1.8;
+  --bg-color:#e0d8bf;
+  --text-color: #333;
+  --control-bg: rgba(0,0,0,0.75);
+  --control-color: #fff;
+  --turnLeft-property:'上一章';
+  --turnRight-property:'下一章';
+  --transition: all 0.3s ease;
+  --reader-padding: 0rem 2rem;
+  --content-padding: 0.618rem 1.618rem;
+  --content-max-width: 800px;
+}
+body.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #bcbcbc;
+  --control-bg: rgba(255,255,255,0.1);
+  --control-color: #a0a0a0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "黑体", "PingFang SC", sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  height: 100vh;
+  overflow: hidden;
+  transition: var(--transition);
+}
+.reader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--reader-padding);
+  overflow: hidden;
+}
+.content {
+  font-size: 200%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--content-padding);
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 1rem;
+}
+.chapter-bar{
+  display: none;
+  justify-content: space-between;
+  position:absolute;
+  top:50vh;
+  width: 100%;
+  transition: var(--transition);
+  pointer-events:none;
+}
+.chapter-always{display: flex;}
+.chapter-item{
+  z-index: 1000;
+  top:0;
+  font-size: 30px;
+  display: flex;
+  width: auto;
+  height: auto;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap:30px;
+}
+.chapter-button{
+  background:var(--control-bg);
+  color: var(--control-color);
+  transition: var(--transition);
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+  border-radius:50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: initial;
+}
+.bars{
+  border: var(--control-bg) 0.1236rem solid;
+  border-radius: 1.98rem;
+  width:100%;
+  height:auto;
+  padding:1.236rem;
+  margin:1rem 0 1rem;
+}
+a{
+  color:var(--text-color);
+  transition: var(--transition);
+}
+a:hover{
+  color:#fff;
+}
+@media (min-width: 942px) {
+  .chapter-bar{display:flex}
+}
+@media (min-width: 1200px) {
+  .chapter-bar{top:calc(50vh - 5rem);}
+  .chapter-button{width: 70px;height: 70px;margin: 30px;}
+}
+
+    

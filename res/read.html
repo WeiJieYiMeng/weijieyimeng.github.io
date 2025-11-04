@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="/_js/styleFit.js"></script>
+  <script src="/_js/cookie.js"></script>
+  <script src="/_js/base62.js"></script>
+  <title>《味界一梦》小说阅读器</title>
+  <style>
+  /* 基础变量（浅色模式默认） */
+  :root {
+    --font-size: 16px;
+    --line-height: 1.8;
+    --bg-color:rgba(194, 178, 128,0.5);
+    --text-color: #333;
+    --control-bg: rgba(0,0,0,0.75);
+    --control-color: #fff;
+    --turnLeft-property:'上一章';
+    --turnRight-property:'下一章';
+    --transition: all 0.3s ease;
+  }
+        
+  /* 深色模式覆盖 */
+  body.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-color: #cccccc;
+    --control-bg: rgba(255,255,255,0.1);
+    --control-color: #a0a0a0;
+  }
+
+
+    /* 全局重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box;}
+    body {
+      font-family: "黑体", "PingFang SC", sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      height: 100vh;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    /* 控制栏（固定在底部） */
+    .control-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--control-bg);
+      color: var(--control-color);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      line-height: 1.1;
+      transition: var(--transition);
+    }
+    .btn-group { gap: 0.5rem; }
+    .btn {
+      background: none;
+      border: none;
+      color: var(--control-color);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .theme-toggle { font-size: 1.2rem; }
+    .marquee-container {
+        width: 7rem;
+    }
+    
+    .marquee-wrapper {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        height: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .marquee-content {
+        display: flex;
+        position: absolute;
+        min-width: 100%;
+        white-space: nowrap;
+        height: 100%;
+        align-items: center;
+        gap: 2rem; 
+        animation: scrollText 15s linear infinite;
+    }
+    
+    .marquee-text {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    
+    @keyframes scrollText {
+        0% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(calc(-50% - 1rem));
+        }
+    }
+
+    /* 章节切换 */
+    .chapter-bar{
+      display: none;
+      justify-content: space-between;
+      position:absolute;
+      top:calc(50vh - 3rem);
+      width: 100%;
+      transition: var(--transition);
+    }
+    .chapter-always{display: flex;}
+    .chapter-item{
+      z-index: 1000;
+      margin: 10px;
+      top:0;
+      width: 50px;
+      height: 50px;
+      border-radius:50%;
+      font-size: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:var(--control-bg);
+      color: var(--control-color);
+      transition: var(--transition);
+    }
+    a.turnLeft:hover::after{
+      content:var(--turnLeft-property);
+      font-size: 1rem;
+      background-color: var(--control-bg);
+      padding: 0.618rem;
+      border-radius: 0.2rem;
+    }
+    a.turnRight:hover::before{
+      content:var(--turnRight-property);
+      font-size: 1rem;
+      background-color: var(--control-bg);
+      padding: 0.618rem;
+      border-radius: 0.2rem;
+    }
+    .chapter-bar-small{
+      display:flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 80%;
+      line-height: 1;
+    }
+    .chapter-bar-small>a{
+      text-align: center;
+    }
+    a.turnLeft-small::after{
+      content: var(--turnLeft-property);
+      font-size: 50%;
+      line-height: 1;
+      }
+    a.turnRight-small::after{
+      content: var(--turnRight-property);
+      font-size: 50%;
+      line-height: 1;
+    }
+    
+    /* 阅读区域 */
+    #reader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0rem 2rem 4rem; /* 上留控制栏，下留页码 */
+      overflow: hidden;
+    }
+    /* 阅读内容区（需与测量容器样式一致） */
+    #content {
+      font-size: 200%;
+      max-width: 800px;
+      margin: 0 auto;
+      height: 100%;
+      overflow-y: auto;
+      padding: 0.618rem 1.618rem; /* 避免滚动条遮挡 */
+      white-space: pre-wrap; /* 保留原换行 */
+      background-color: rgba(0,0,0,0.05);
+      border-radius: 1rem;
+    }
+    /* 测量容器（隐藏，1:1同步阅读区样式） */
+    #measure {
+      font-size: 200%;
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: calc(100% - 4rem); /* 与#content左右padding一致 */
+      padding: 0 2rem;
+      white-space: pre-wrap;
+      visibility: hidden;
+    }
+    /*提示*/
+    #hint-box{
+      position: absolute;
+      z-index: 1001;
+      display: flex;
+      justify-content: center;
+      top: 0;
+      width: 100%;
+      transform: translateY(calc(-100% - 1rem));
+      font-size: 180%;
+      transition: var(--transition);
+    }
+    #hint{
+      border: solid 1px #aaa;
+      border-radius: 0.6rem;
+      background: rgba(30,30,30,0.9);
+      color: var(--control-color);
+      padding: 0.5rem 1rem;
+      white-space: pre-wrap;
+      text-align: center;
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 768px) {
+      .control-bar { padding: 0.75rem; }
+      #reader {padding: 0rem 1.75rem 3.2rem;}
+    }
+    @media (max-width: 480px) {
+      .btn-group { gap: 0.25rem; }
+      .btn { font-size: 0.8rem; }
+    }
+    @media (min-width: 942px) {
+      .chapter-bar{display:flex}
+    }
+    @media (min-width: 1200px) {
+      .chapter-bar{top:calc(50vh - 5rem);}
+      .chapter-item{width: 70px;height: 70px;margin: 30px;}
+    }
+    
+    b{
+      display: inline;
+      color:#f00;
+    }
+  </style>
+</head>
+
+<body>
+  <!--通知-->
+  <div id="hint-box">
+    <div id="int-inside">
+      <div id="hint">提示框</div>
+    </div>
+  </div>
+  
+  <!--控制器-->
+  <div class="control-bar">
+    <div class="btn-group">
+      <button class="btn fontSize" title="调整字号">A±</button>
+      <button class="btn lineHeight" title="调整行距">↕≡</button>
+      <button class="btn version" title="全屏模式">◱</button>
+    </div>
+    <button class="btn theme" title="切换深色模式">🌙</button>
+    <div class="marquee-container">
+      <div class="marquee-wrapper">
+        <div id="marqueeContent" class="marquee-content" title="双击回到目录；单击显示章节切换">
+          <div class="marquee-text">参数错误</div>
+          <div class="marquee-text">参数错误</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!--章节控制器-->
+  <div class="chapter-bar">
+    <a class="chapter-item turnLeft" title="上一章">&lt;</a>
+    <a class="chapter-item turnRight" title="下一章">&gt;</a>
+  </div>
+  
+  <!--阅读核心区-->
+  <div id="reader">
+    <div id="content" style="overflow: auto;word-wrap: break-word;"><span id="contentin">无传参或非法传参，无法载入数据。
+请在url后传参：?b=书名。
+
+例如：
+...read.html?b=大院里的小叶子
+
+<a href="javascript:history.back()">返回上一页</a>
+</span>
+
+<hr/><br/><div class="chapter-bar-small">
+    <a class="turnLeft-small" style="text-align:left">&lt;上一章<br/></a>
+    <a class="turnMenu">目录</a>
+    <a class="turnRight-small" style="text-align:right">下一章&gt;<br/></a>
+  </div></div>
+  </div>
+  
+  
+  <script>
+    //字号调节
+    var customFontSize;{const setNum= Number(localStorage.getItem("fontSize"));customFontSize= setNum>0 ? setNum : 16 ;}
+    document.documentElement.style.fontSize = `${customFontSize}px`;
+    function setFontSize(){
+      let inputFontSize = Number(prompt("请输入目标字号(px)",customFontSize));
+      if (Number.isFinite(inputFontSize) && inputFontSize > 0) {customFontSize = inputFontSize;}else{hint("<b>设置失败</b>\n若无输入错误，可能是遭到浏览器拦截。");return 0; }
+      document.documentElement.style.fontSize = `${customFontSize}px`;
+      hint("字号调整为:"+customFontSize+"px");
+      setCookie('fontSize', customFontSize);
+    }
+    document.querySelector('.fontSize').addEventListener('click', setFontSize);
+    
+    //行距调节
+    var customLineHeight;{const setNum= Number(getCookie("lineHeight"));customLineHeight= setNum>0 ? setNum : 1.3 ;}
+    document.documentElement.style.lineHeight = customLineHeight ;
+    function setLineHeight(){
+      let inputLineHeight = Number(prompt("请输入目标行距(倍)",customLineHeight));
+      if (Number.isFinite(inputLineHeight) && inputLineHeight > 0) {customLineHeight = inputLineHeight;}else{hint("<b>设置失败</b>\n若无输入错误，可能是遭到浏览器拦截。");return 0; }
+      document.documentElement.style.lineHeight = customLineHeight;
+      hint("行距调整为:"+customLineHeight+"倍行距");
+      setCookie('lineHeight', customLineHeight);
+    }
+    document.querySelector('.lineHeight').addEventListener('click', setLineHeight);
+    
+    //全屏实现
+    function fullScreen(){
+      if(document.fullscreenElement){document.exitFullscreen();hint("退出全屏")}else{document.querySelector("html").requestFullscreen();hint("全屏模式\nEsc\/F11\/长按以退出全屏")};
+    }
+    document.querySelector('.version').addEventListener('click',()=>{fullScreen()});
+    
+    //深色模式
+    var isDarkMode= getCookie("darkMode") === "true";
+    if(isDarkMode){document.body.classList.add('dark-mode')};
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('dark-mode', isDarkMode);
+      hint(isDarkMode?"深色模式":"浅色模式");
+      setCookie('darkMode', isDarkMode);
+    }
+    document.querySelector('.theme').addEventListener('click', toggleDarkMode);
+    
+    //上一页下一页章节名  
+    function urlrel(release){let params=new URLSearchParams(window.location.href.split('?')[1]);return params.get(release);}
+    var bookname=urlrel("b");
+    var nowChapter=Number(urlrel("c"));
+    if(bookname+nowChapter ==0){
+      hint("<b>传参错误</b>\n无传参或非法传参");
+      throw new Error("无传参或非法传参");
+    }else{
+      //解析目录
+      fetch("/"+bookname+"/menu.js")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
+      .then(text => {
+        try{eval(text);}catch{throw new Error("无法编译目录");}
+        return menu;
+      })
+      .then(menu =>{
+        if(menu[nowChapter]==undefined){throw new Error("超越目录最大章");}
+        document.querySelector("title").textContent=menu[nowChapter]+" - "+bookname+" - 味界一梦";
+        infoChange(bookname + " " +menu[nowChapter]);
+        chapterNameChange(menu[nowChapter-1],menu[nowChapter+1]);
+      })
+      .catch(error => {
+        hint("<b>目录读取错误</b>\n"+error);
+        console.error('目录读取错误', error);
+        infoChange('目录加载失败');
+      });
+    }
+
+    //读取txt文件
+    fetch('/'+bookname+'/'+nowChapter+'.txt')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`txt coding: HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(text => {
+        document.getElementById('contentin').textContent = text;
+        setCookie("lastB",bookname);
+        setCookie("lastC",nowChapter);
+        setCookie()
+      })
+      .catch(error => {
+        hint("<b>文件读取错误</b>\n"+error);
+        console.error('文件读取错误', error);
+      });
+    
+    //更换左右章内容
+    function chapterNameChange(leftChapter="已是第一章节",rightChapter="已是最后一章"){
+      document.documentElement.style.setProperty('--turnLeft-property', `"${leftChapter}"`);
+      document.documentElement.style.setProperty('--turnRight-property', `"${rightChapter}"`);
+    }
+    
+    //切换章节
+    function turnChapter(newChapter){
+      location.href="/read.html?b="+bookname+"&c="+newChapter;
+    }
+    
+    //悬浮章节按钮
+    document.querySelector(".turnLeft").addEventListener('click',()=>{turnChapter(nowChapter-1)});
+    document.querySelector(".turnLeft-small").addEventListener('click',()=>{turnChapter(nowChapter-1)});
+    document.querySelector(".turnRight").addEventListener('click',()=>{turnChapter(nowChapter+1)});
+    document.querySelector(".turnRight-small").addEventListener('click',()=>{turnChapter(nowChapter+1)});
+    document.querySelector(".turnMenu").addEventListener('click',()=>{location.href="/book.html?b="+bookname});
+    document.querySelector('.marquee-container').addEventListener('click', ()=>{document.querySelector(".chapter-bar").classList.toggle('chapter-always');hint("双击信息栏以回到目录")});
+    document.querySelector('.marquee-container').addEventListener('dblclick',()=>{location.href = "/menu.html?b=" + bookname ;});
+    //更换信息处显示内容
+    function infoChange(text){
+      document.querySelector(".marquee-content").innerHTML=`
+      <div class="marquee-text">${text}</div>
+      <div class="marquee-text">${text}</div>
+      `
+    }
+    
+    //弹出提示
+    var backTimeOut;
+    function hint(prom){
+      const hintBox=document.querySelector("#hint-box");
+      const hint=document.querySelector("#hint");
+      hint.innerHTML=prom;
+      hintBox.style.transform="translateY(1rem)";
+      clearTimeout(backTimeOut);
+      backTimeOut = setTimeout(()=>{hintBox.style.transform="translateY(calc(-100% - 1rem))";},3000)
+    }
+  </script>
+</body>
+</html>
