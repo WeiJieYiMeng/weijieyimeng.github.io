@@ -61,11 +61,9 @@
     document.querySelector("title").innerHTML=bookname+document.querySelector("title").innerHTML;
     //上次阅读
     var lastC=Number(localStorage.getItem(bookname));
-    if(lastC < 1 ){document.querySelector("#lastRead").style.display="none";document.querySelector(".turnRight a").innerHTML="&gt;";lastC=1}
     //turnTo
     function turnTo(num){
       if(num=="menu"){location.href="/book.html?b="+bookname;return 0;}
-      lastC=num;
       getText(num);
       getMenu(num);
       document.querySelector("#backTop").click();
@@ -75,13 +73,16 @@
       fetch('/'+bookname+'/'+num+'.txt')
         .then(response => {
           if (!response.ok) {
+            window.top.postMessage({listenAct:"stop"});
             throw new Error(`txt coding: HTTP error! status: ${response.status}`);
           }
           return response.text();
         })
         .then(text => {
           document.querySelector("#contentin").textContent = text;
+          if(window.top.isListening==1){window.top.postMessage({listenText:text})}
           localStorage.setItem(bookname,num);
+          lastC=num;
           localStorage.setItem("lastB",bookname);
         })
         .catch(error => {
@@ -95,6 +96,8 @@
     window.addEventListener("message",(event)=>{
       if(event.origin!=location.origin)throw new Error("通信非同源");
       if(event.data.menuLoaded==bookname)menuGot();
+      if(event.data.listenAct=="start")window.top.postMessage({listenText:document.querySelector("#contentin").textContent});
+      if(event.data.listenAct=="next")turnTo(lastC + 1);
     })
     var menu=null;
     function menuGot(){
@@ -109,6 +112,8 @@
       document.documentElement.style.setProperty('--turnRight-property', `"${rightC}"`);
       if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到目录")},3150)}
     }
+    
+    //document.querySelector("#contentin").textContent
   </script>
 </body>
 </html>

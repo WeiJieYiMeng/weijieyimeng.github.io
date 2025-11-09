@@ -87,6 +87,9 @@
       .btn-group { gap: 0.1rem; }
       .btn { font-size: 0.6rem;padding: 0.25rem 0.2rem;}
     }
+    .listening .listenStop{display:inline !important}
+    .listening .listenStart{display:none !important}
+    .listening .listenSpeed{display:inline !important}
   </style>
 </head>
 <body>
@@ -96,9 +99,9 @@
       <button class="btn lineHeight" title="调整行距">↕<span>1.1</span></button>
       <button class="btn paddingMode" title="边框模式">边</button>
     </div>
-    <div class="btn-group">
+    <div class="btn-group" id="listenBar">
       <button class="btn listenStart" title="开始收听" >▶</button>
-      <button class="btn listenSpeed" style="display:none" title="收听速度">1x</button>
+      <button class="btn listenSpeed" style="display:none;font-size: 80%;" title="收听速度">1x</button>
       <button class="btn listenStop" style="display: none;" title="停止收听">■</button>
     </div>
     <div class="btn-group">
@@ -119,7 +122,6 @@
     </div>
   </main>
   <script>
-    
     //弹出提示
     var backTimeOut;
     function hint(prom){
@@ -171,12 +173,9 @@
     }
     var numPaddingMode= localStorage.getItem("paddingMode");
     if(numPaddingMode===null){
-      numPaddingMode=3;
-      const cW=document.querySelector("html").clientWidth;
-      if(cW>=480)numPaddingMode--;
-      if(cW>=768)numPaddingMode--;
+      numPaddingMode=2;
       localStorage.setItem("paddingMode", numPaddingMode%4 );
-      hint("根据您的设备宽度\n边框模式初始为："+uiPaddingMode(numPaddingMode));
+      hint("欢迎访问味界一梦<br/>wjym.windwhir.top");
       try{iframeWindow.styleFit.paddingMode()}catch{console.log("paddingMode no clear")};
     }else{
       numPaddingMode=Number(numPaddingMode)
@@ -218,22 +217,54 @@
     document.addEventListener("fullscreenchange",onFullScreenChange)
     //收听与停止
     var isListening=0;
-    function btnListenStart(){
-      return hint("收听暂未开放") ;
-      // if(iframeWindow.location.pathname.indexOf("text")<0){return hint("仅可收听文章页")}
-      // if(!('speechSynthesis' in window)){return hint("浏览器不支持朗读\n建议更换FireFox(火狐)")}
-      // if (!speechSynthesis.getVoices().length) {hint("请授予浏览器\n语音权限")}
-      // isListening=1;
-      // return hint("已调用阅读，请稍侯")
+    function listenStart(){
+      if(speechSynthesis.paused){isListening=1;document.querySelector("#listenBar").classList.toggle('listening', isListening);return speechSynthesis.resume();}
+      if(iframeWindow.location.pathname.indexOf("text")<0&&iframeWindow.location.pathname.indexOf("book")<0){return hint("仅可收听目录与文章页")}
+      if(!('speechSynthesis' in window)){return hint("浏览器不支持朗读\n建议更换FireFox(火狐)")}
+      if (!speechSynthesis.getVoices().length) {hint("请授予浏览器\n语音权限")}
+      isListening=1;
+      document.querySelector("#listenBar").classList.toggle('listening', isListening);
+      iframePost({listenAct:"start"});
+      return hint("已调用听书，请稍侯");
     }
-    eve(".listenStart",btnListenStart)
-    // eve(".listenSpeed",btnListenSpeed)
-    // eve(".listenStop",btnListenStop)
+    var listenSpeedNum = JSON.parse( localStorage.getItem("listenSpeedNum") || 1);
+    document.querySelector(".listenSpeed").innerHTML=listenSpeedNum+"x";
+    function listenSpeed(){
+      let inputspeednum = Number(prompt("请输入目标速度(x)",listenSpeedNum));
+      if (Number.isFinite(inputspeednum) && inputspeednum > 0) {listenSpeedNum = inputspeednum;}else{hint("<b>设置失败</b>\n若无输入错误，可能是遭到浏览器拦截。");throw new Error("listenSpeed: prompt cancel")}
+      localStorage.setItem("listenSpeedNum",listenSpeedNum)
+      document.querySelector(".listenSpeed").innerHTML=listenSpeedNum+"x";
+      hint("由于api限制，无法即时更改<br/>将在下一章更换速度<br/>刷新网页以立即更新速度")
+    }
+    eve(".fontSize",btnFontSize);
+    function listenStop(){
+      if(isListening)hint("听书结束");
+      isListening=0;
+      document.querySelector("#listenBar").classList.toggle('listening', isListening);
+      speechSynthesis.pause();
+    }
+    function listenRead(txt,speed){
+      isListening=0;
+      speechSynthesis.cancel();
+      let utterance = new SpeechSynthesisUtterance();
+      utterance.text=txt;
+      utterance.rate=speed;
+      utterance.volume=1;
+      utterance.onend=()=>{if(isListening){iframePost({listenAct:"next"})}};
+      speechSynthesis.speak(utterance);
+      hint("听书开始");
+      setTimeout(()=>{isListening=1},1000)
+    }
+    eve(".listenStart",listenStart);
+    eve(".listenSpeed",listenSpeed);
+    eve(".listenStop",listenStop);
     //监听消息
     window.addEventListener("message",(event)=>{
       if(event.origin!=location.origin)throw new Error("通信非同源");
       if(event.data.loadMenu)loadMenu(event.data.loadMenu);
       if(event.data.readText)readText(event.data.readText);
+      if(event.data.listenAct=="stop")listenStop();
+      if(event.data.listenText)listenRead(event.data.listenText,listenSpeedNum);
     })
     window.addEventListener('error', (event)=>{
       hint(event.message);
@@ -249,10 +280,11 @@
     var menu=null;
     var menuB=null;
     function loadMenu(bookname){
-      if(bookname==menuB){iframePost({menuLoaded:menuB})}
+      if(bookname==menuB){iframePost({menuLoaded:menuB});return 0;}
       fetch("/"+bookname+"/menu.js")
         .then(response => {
           if (!response.ok) {
+            iframePost({menuLoaded:"fail"});
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           return response.text();

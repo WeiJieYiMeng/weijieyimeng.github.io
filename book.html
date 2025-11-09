@@ -12,22 +12,19 @@
     <div class="content" style="overflow: auto;word-wrap: break-word;">
       <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" onclick="location.href='/home.html'"/>味界一梦：</b>
       <h1></h1>
-      <div id="lastRead">
+      <div id="lastRead" class="bars">
+        <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读</b>
         <hr/>
-        <div class="bars">
-          <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读</b>
-          <hr/>
-          <div><a href="javascript:turnTo(lastC)"><span id="lastReadGo"></span><br/>继续阅读&gt;</a></div>
-        </div>
+        <div><a href="javascript:turnTo(lastC)"><span id="lastReadGo"></span><br/>继续阅读&gt;</a></div>
       </div>
-      <div class="bars">
+      <div class="bars" id="goBar">
         <a href="javascript:turnTo(1)">从头开始阅读</a>
         <input type="text" placeholder="输入数字直接转跳" style="font-size: 2rem;width:100%;border-radius:10px;background-color: var(--bg-color);transition:var(--transition);" onblur="turnTo(Number(document.querySelector('input').value))"/>
       </div>
       <div class="bars" id="text0" style="word-wrap: break-word;white-space: pre-wrap;">
         简介(Loading)
       </div>
-      <div class="bars">
+      <div class="bars" id="menuBar">
         <a href="javascript:menuUp()">向上加载</a><hr/>
         <div id="menuList"></div>
         <a href="javascript:menuDown()">向下加载</a><br/>
@@ -52,7 +49,9 @@
     //上次阅读
     var lastC=Number(localStorage.getItem(bookname));
     if(lastC < 1 ){document.querySelector("#lastRead").style.display="none";document.querySelector(".turnRight a").innerHTML="&gt;";lastC=1}
+    //turnto
     function turnTo(num){
+      if(num>menu.length||num<0){throw new Error(window.top.hint("章节不存在")||"章节不存在")};
       localStorage.setItem(bookname,num);
       location.href="/text.html?b="+bookname;
     }
@@ -60,12 +59,15 @@
     fetch('/'+bookname+'/0.txt')
       .then(response => {
         if (!response.ok) {
+          window.top.postMessage({listenAct:"stop"});
+          document.querySelector("#text0").innerHTML="简介加载失败<br/>请检查书名是否正确"
           throw new Error(`txt coding: HTTP error! status: ${response.status}`);
         }
         return response.text();
       })
       .then(text => {
         document.getElementById('text0').textContent = text;
+        if(window.top.isListening==1){window.top.postMessage({listenText:text})}
       })
       .catch(error => {
         window.top.hint("<b>文件读取错误</b>\n"+error);
@@ -96,16 +98,25 @@
       }
       //目录处理
       window.top.postMessage({loadMenu:bookname});
-      window.addEventListener("message",(event)=>{
-        if(event.origin!=location.origin)throw new Error("通信非同源");
-        if(event.data.menuLoaded==bookname)menuGot();
-      })
       var menu=null;
       function menuGot(){
         menu=window.top.menu;
+        if(menu.length==1){menuFail();return 0;}
         document.querySelector("#lastReadGo").innerHTML=menu[lastC];
         startMenu();
       }
+      function menuFail(){
+        document.querySelector(".turnRight").style.display="none";
+        document.querySelector("#menuBar").style.display="none";
+        document.querySelector("#goBar").innerHTML="目录加载失败";
+      }
+      //监听消息
+      window.addEventListener("message",(event)=>{
+        if(event.origin!=location.origin)throw new Error("通信非同源");
+        if(event.data.menuLoaded==bookname){menuGot();}else if(event.data.menuLoaded=="fail"){menuFail();}
+        if(event.data.listenAct=="start")window.top.postMessage({listenText:document.querySelector("#text0").textContent});
+        if(event.data.listenAct=="next")window.top.postMessage({listenAct:"stop"});
+      })
   </script>
 </body>
 </html>
