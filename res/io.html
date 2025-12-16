@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/styleFit.js"></script>
+  <title>导入导出-味界一梦wjym.windwhir.top</title>
+  <style>
+    input{font-size: 2rem;width:100%;border-radius:10px;background-color: var(--bg-color);transition:var(--transition)}
+  </style>
+</head>
+<body>
+  <div class="reader">
+    <div class="content" style="overflow: auto;word-wrap: break-word;">
+      <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" onclick="location.href='/home.html'"/>味界一梦：</b>
+      <h1>数据导入导出</h1>
+      
+      <div id="daoBars">
+        <div class="bars">
+          <b onclick="dao(1)">导入 &gt;</b>
+          <hr/>
+          <div style="font-size:70%">粘贴您在其它终端导出的字符串，解析成为个性化设置和阅读记录，并导入本地。</div>
+        </div>
+        <div class="bars">
+          <b onclick="dao(0);startOut()">导出 &gt;</b>
+          <hr/>
+          <div style="font-size:70%">将本地的阅读记录和个性化设置导出成为字符串，便于分享至其他终端。</div>
+        </div>
+      </div>
+      
+      <div id="dao1" style="display:none">
+        <div class="bars">
+          <b>导入 <a onclick="location.reload()">&lt;</a></b>
+          <hr/>
+          <input type="text" placeholder="在此粘贴其他终端导出的字符串" onblur="textIn()" id="textIn"/>
+        </div>
+        <div class="bars">
+          <b>阅读记录</b> <a href="javascript:booksInAll()">一键覆盖</a>
+          <hr/>
+          <div id="booksIn" style="font-size: 50%;"></div>
+        </div>
+        <div class="bars">
+          <b>个性化设置</b> <a href="javascript:settingsInAll()">一键覆盖</a>
+          <hr/>
+          <div id="settingsIn" style="font-size: 50%;"></div>
+        </div>
+      </div>
+      
+      <div id="dao0" style="display:none">
+        <div class="bars">
+          <b>导出 <a onclick="location.reload()">&lt;</a></b>
+          <hr/>
+          <input type="text" onblur="textOut()" id="textOut"/>
+          您可复制上述字符串，分享给需要导入的设备。
+        </div>
+        <div class="bars">
+          <b>当前模式</b> <a href="javascript:textOut()" id="outShow"></a>
+          <hr/>
+          <a href="javascript:outMode(0)">导出两者</a><hr/>
+          <a href="javascript:outMode(1)">导出阅读记录</a><hr/>
+          <a href="javascript:outMode(2)">导出个性化设置</a><hr/>
+        </div>
+      </div>
+      
+      <div style="width:100%;text-align: center;font-size: 50%;">笔者: 豆福 3287195988@qq.com<br/>技术支持: 风吹呼呼 windwhir@163.com</div>
+    </div>
+  </div>
+  
+  <div class="chapter-bar">
+    <div class="chapter-item turnLeft" onclick="location.href='/home.html'"><a title="回到主页" class="chapter-button">H</a></div>
+    <div class="chapter-item turnRight"></div>
+  </div>
+  
+  <script>
+    //初始化
+    styleFit.all();
+    localStorage.setItem("lastPage",location.pathname+location.search);
+    var firstGetMenu=0;
+    if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到主页")},3150)}
+    //可供选择的值
+    var books=["大院里的小叶子","小葱豆腐"];
+    var settings=["darkMode","fontSize","lineHeight","paddingMode"];
+    //导入时
+    var booksIn,settingsIn;
+    function textIn(){
+      const uri=document.querySelector("#textIn").value;
+      booksIn=[];settingsIn=[];
+      document.querySelector("#booksIn").innerHTML=document.querySelector("#settingsIn").innerHTML="项目 - 导入值 - 本地值"
+      try{
+        let i=0;
+        books.forEach(book=>{
+          let _book=booksIn[i]=[book,Number(new URLSearchParams(uri).get(book)),Number(localStorage.getItem(book))];
+          if(_book[1]>0){document.querySelector("#booksIn").innerHTML+=`<br/>${_book[0]} - <a href='javascript:localStorage.setItem("${_book[0]}","${_book[1]}")'>第${_book[1]}页</a> - <a href='javascript:localStorage.setItem("${_book[0]}","${_book[2]}")'>第${_book[2]}页</a>`}
+          i++;
+        })
+        i=0;
+        settings.forEach(setting=>{
+          let _setting=settingsIn[i]=[setting,new URLSearchParams(uri).get(setting),localStorage.getItem(setting)];
+          if(_setting[1] !==null){document.querySelector("#settingsIn").innerHTML+=`<br/>${_setting[0]} - <a href='javascript:localStorage.setItem("${_setting[0]}","${_setting[1]}")'>${_setting[1]}</a> - <a href='javascript:localStorage.setItem("${_setting[0]}","${_setting[2]}")'>${_setting[2]}</a>`}
+          i++;
+        })
+      }catch(e){window.top.hint("输入的字符串有误\n"+e)}
+    }
+    //一键导入
+    function booksInAll(){
+      if(!confirm("将完全覆盖，是否确认？"))return 0;
+      try{
+        booksIn.forEach(book=>{
+          if(book[1]>0){localStorage.setItem(book[0],book[1])}
+        })
+        window.top.hint("一键覆盖成功");
+      }catch(e){window.top.hint("导入失败\n"+e)}
+    }
+    function settingsInAll(){
+      if(!confirm("将完全覆盖，是否确认？"))return 0;
+      try{
+        settingsIn.forEach(setting=>{
+          if(setting[1]>0){localStorage.setItem(setting[0],setting[1])}
+        })
+        window.top.hint("一键覆盖成功");
+      }catch(e){window.top.hint("导入失败\n"+e)}
+    }
+    //导出时
+    var outString,booksOut,settingsOut;
+    function startOut(){
+      let bookPairs=[];
+      books.forEach(book=>{
+        let _book=localStorage.getItem(book);
+        if(_book!==null){bookPairs.push(book+"="+_book)}
+      })
+      booksOut=bookPairs.length > 0 ? bookPairs.join('&') : '';
+      let settingPairs=[];
+      settings.forEach(setting=>{
+        let _setting=localStorage.getItem(setting);
+        if(_setting!==null){settingPairs.push(setting+"="+_setting)}
+      })
+      settingsOut=settingPairs.length > 0 ? settingPairs.join('&') : '';
+      outMode(0);
+    }
+    function outMode(num){
+      let outShow;
+      switch(num){
+        case 1:outString=booksOut;outShow="阅读记录";break;
+        case 2:outString=settingsOut;outShow="个性化设置";break;
+        case 0:outString=booksOut+"&"+settingsOut;outShow="两者"
+      }
+      document.querySelector("#outShow").innerHTML=outShow;
+      textOut();
+    }
+    function textOut(){
+      document.querySelector("#textOut").value=outString;
+    }
+    //选择导入导出
+    function dao(num){
+      document.querySelector("#daoBars").style.display="none";
+      num?document.querySelector("#dao1").style.display="block":document.querySelector("#dao0").style.display="block";
+      document.querySelector("h1").innerHTML=num?"数据导入":"数据导出";
+    }
+  </script>
+</body>
+</html>
