@@ -53,7 +53,6 @@
     }
     #hint-box{
       position: absolute;
-      z-index: 1001;
       display: flex;
       justify-content: center;
       top: 0;
@@ -61,15 +60,18 @@
       transform: translateY(calc(-100% - 1rem));
       font-size: 180%;
       transition: var(--transition);
+      pointer-events:none;
     }
     #hint{
       border: solid 1px #aaa;
+      z-index: 1000;
       border-radius: 0.6rem;
       background: rgba(30,30,30,0.9);
       color: var(--control-color);
       padding: 0.5rem 1rem;
       white-space: pre-wrap;
       text-align: center;
+      pointer-events:initial;
     }
     b{
       display: inline;
@@ -112,12 +114,10 @@
   </div>
   <main>
     <div id="fullScreenDiv">
-      <iframe>
+      <iframe aria-label="主要内容区域">
       </iframe>
       <div id="hint-box">
-        <div id="int-inside">
-          <div id="hint">提示框</div>
-        </div>
+        <div id="hint">提示框</div>
       </div>
     </div>
   </main>
@@ -218,9 +218,8 @@
     //收听与停止
     var isListening=0;
     function listenStart(){
+      if(!('speechSynthesis' in window)){return hint("<a href='https://www.microsoft.com/zh-cn/edge'>该浏览器不支持朗读\n点此获取微软边缘(Edge)</a>")}
       if(speechSynthesis.paused){isListening=1;document.querySelector("#listenBar").classList.toggle('listening', isListening);return speechSynthesis.resume();}
-      if(iframeWindow.location.pathname.indexOf("text")<0&&iframeWindow.location.pathname.indexOf("book")<0){return hint("仅可收听目录与文章页")}
-      if(!('speechSynthesis' in window)){return hint("浏览器不支持朗读\n建议更换FireFox(火狐)")}
       if (!speechSynthesis.getVoices().length) {hint("请授予浏览器\n语音权限")}
       isListening=1;
       document.querySelector("#listenBar").classList.toggle('listening', isListening);

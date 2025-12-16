@@ -115,8 +115,9 @@
         if(event.origin!=location.origin)throw new Error("通信非同源");
         if(event.data.menuLoaded==bookname){menuGot();}else if(event.data.menuLoaded=="fail"){menuFail();}
         if(event.data.listenAct=="start")window.top.postMessage({listenText:document.querySelector("#text0").textContent});
-        if(event.data.listenAct=="next")window.top.postMessage({listenAct:"stop"});
       })
+      var firstGetMenu=0;
+      if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到主页")},3150)}
   </script>
 </body>
 </html>

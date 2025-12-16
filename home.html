@@ -20,17 +20,22 @@
       -->
       <hr/>
       <h1 style="width:100%;text-align: center;padding:1.3rem 0 1rem"><img src="/favicon.png" style="width: 3rem;height: 3rem;" />味界一梦</h1>
-      <div style="width:100%;text-align: center;">系列小说 / <a href="/world/index.html">世界观&gt;</a></div>
+      <div style="width:100%;text-align: center;">系列小说 / <a href="/res/world.html">世界观&gt;</a></div>
       <div style="width:100%;text-align: center;font-size: 70%;padding:0.5rem 0 1rem">笔者: 豆福</div>
       <hr/>
-      <div id="lastRead">
-        <div class="bars">
-          <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读</b>
-          <hr/>
-          <div><a href="javascript:lastRead()"><span id="lastReadGo"></span><br/>继续阅读&gt;</a></div>
-        </div>
+      <div class="bars" id="lastReadBar">
+        <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />上次阅读 <a href="/res/io.html" style="font-weight: normal;font-size: 61%;">io&gt;</a></b>
         <hr/>
+        <div id="lastRead"></div>
       </div>
+<!--      
+      <div class="bars" id="updatesBar">
+        <b><img src="/favicon.png" style="width:1.8rem;height:1.8rem;" />最近更新 <a href="/res/up.html" style="font-weight: normal;font-size: 61%;">all&gt;</a></b>
+        <hr/>
+        <div id="updates">
+      </div>
+        -->
+      <hr/>
       <div id="books">
       </div>
       <hr/>
@@ -93,11 +98,19 @@
   <script>
     styleFit.all();
     localStorage.setItem("lastPage",location.pathname);
-    const lastB=localStorage.getItem("lastB");
-    if(lastB === null){document.querySelector("#lastRead").style.display=document.querySelector(".turnRight").style.display ="none"}
-    else{document.querySelector("#lastReadGo").innerHTML=lastB+"("+localStorage.getItem(lastB)+"页)"}
+    const B=localStorage.getItem("B");
+    if(B === null){
+      document.querySelector(".turnRight").style.display ="none";
+      document.querySelector("#lastRead").innerHTML=`<a href="/res/io.html">导入阅读记录 io&gt;</a>`
+    }
+    else{
+      document.querySelector("#lastRead").innerHTML=`<a href="javascript:lastRead()">${B+"("+localStorage.getItem(B)+"页)"}<br/>继续阅读&gt;</a>`
+    }
+    // function updates(){
+    //   let localV=localStorage.getItem("V")
+    // }
     function lastRead(){
-      location.href=`/text.html?b=${lastB}`
+      location.href=`/text.html?b=${B}`
     }
     function appendBook(){
       for(let i=0;i<books.length;i++){
@@ -110,6 +123,11 @@
         document.querySelector("#books").appendChild(newBar);
       }
     }
+    window.addEventListener("message",(event)=>{
+      if(event.origin!=location.origin)throw new Error("通信非同源");
+      if(event.data.listenAct=="start")window.top.postMessage({listenText:"欢迎回到味界一梦。您上次读到："+document.querySelector("#lastRead").textContent+"。进入阅读页面时将自动开始阅读！"});
+      if(event.data.listenAct=="next")window.top.postMessage({listenAct:"stop"});
+    })
     window.onload=appendBook();
   </script>
 </body>

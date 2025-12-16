@@ -83,7 +83,7 @@
           if(window.top.isListening==1){window.top.postMessage({listenText:text})}
           localStorage.setItem(bookname,num);
           lastC=num;
-          localStorage.setItem("lastB",bookname);
+          localStorage.setItem("B",bookname);
         })
         .catch(error => {
           window.top.hint("<b>文件读取错误</b>\n"+error);
@@ -112,8 +112,6 @@
       document.documentElement.style.setProperty('--turnRight-property', `"${rightC}"`);
       if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到目录")},3150)}
     }
-    
-    //document.querySelector("#contentin").textContent
   </script>
 </body>
 </html>

@@ -46,3 +46,7 @@ var styleFit={
     });
   }
 }
+function hint(nope){
+  let a=confirm(nope+"\n\n您正在以非正常方式浏览本站。\n点击“是”以切换回正常方式。");
+  if(a){location.href="/"}
+}
