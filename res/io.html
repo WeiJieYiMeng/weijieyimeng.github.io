@@ -27,6 +27,11 @@
           <hr/>
           <div style="font-size:70%">将本地的阅读记录和个性化设置导出成为字符串，便于分享至其他终端。</div>
         </div>
+        <div class="bars">
+          <b onclick="if(confirm('危险操作，是否继续？'){localStorage.clear();window.top.hint("已清空所有阅读记录及个性化设置")})">清空 [!]</b>
+          <hr/>
+          <div style="font-size:70%">清空所有阅读记录和个性化设置。</div>
+        </div>
       </div>
       
       <div id="dao1" style="display:none">
@@ -75,11 +80,10 @@
   <script>
     //初始化
     styleFit.all();
-    localStorage.setItem("lastPage",location.pathname+location.search);
     var firstGetMenu=0;
     if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到主页")},3150)}
     //可供选择的值
-    var books=["大院里的小叶子","小葱豆腐"];
+    var books=["大院里的小叶子","小葱豆腐","藻荇交横","宁静致远","夏虫不可语冰","环游"];
     var settings=["darkMode","fontSize","lineHeight","paddingMode"];
     //导入时
     var booksIn,settingsIn;
@@ -118,7 +122,7 @@
         settingsIn.forEach(setting=>{
           if(setting[1]>0){localStorage.setItem(setting[0],setting[1])}
         })
-        window.top.hint("一键覆盖成功");
+        window.top.hint("一键覆盖成功，刷新网页以更新");
       }catch(e){window.top.hint("导入失败\n"+e)}
     }
     //导出时
@@ -159,4 +163,5 @@
     }
   </script>
 </body>
+
 </html>
