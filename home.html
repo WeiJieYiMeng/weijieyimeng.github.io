@@ -126,9 +126,9 @@
     window.addEventListener("message",(event)=>{
       if(event.origin!=location.origin)throw new Error("通信非同源");
       if(event.data.listenAct=="start")window.top.postMessage({listenText:"欢迎回到味界一梦。您上次读到："+document.querySelector("#lastRead").textContent+"。进入阅读页面时将自动开始阅读！"});
-      if(event.data.listenAct=="next")window.top.postMessage({listenAct:"stop"});
     })
     window.onload=appendBook();
   </script>
 </body>
+
 </html>
