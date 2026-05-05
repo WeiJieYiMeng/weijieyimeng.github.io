@@ -11,7 +11,7 @@
   <div class="reader">
     <div class="content" style="overflow: auto;word-wrap: break-word;/*white-space: pre-wrap;*/">
 <!--  
-      <div>
+      <div>调试选项
         <a href="/world.html">转跳world</a>
         <a href="/book.html">转跳book</a>
         <a href="/text.html">转跳text</a>
@@ -36,7 +36,7 @@
       </div>
         -->
       <hr/>
-      <div style="text-align: center;padding-top: 1rem;"><a href="javascript:appendBook()">系列</a> | <a href="javascript:appendBook(1)">网文</a><!-- | <a href="javascript:appendBook(2)">列表</a> --></div>
+      <div style="text-align: center;padding-top: 1rem;"><a href="javascript:showBooks()">推荐阅读</a> | <a href="javascript:allBooks()">全部列表</a><!-- | <a href="javascript:appendBook(2)">列表</a> --></div>
       <div id="books">
       </div>
       <hr/>
@@ -56,90 +56,120 @@
       name:"大院里的小叶子",
       nation:"月荫",
       char:"叶子(林叶芷),张读,豆腐大院 等",
-      tab:"【无刀x日常向x孩子x成长x单女主】"
-    },
-    {
-      textMode:"小葱豆腐三部曲为系列主书，以李晓聪张读的感情与成长为明线，以“人格”的锻造、实现与超越为暗线，从个人救赎到国家革新，最终为神构建人界系新秩序。<br/>《小葱豆腐1人与奴》晓聪视角，她6岁半—14岁半，“一个人”的诞生与确认；<br/>《小葱豆腐2压与纵》张读视角，她16岁—26岁，“一个国”的自检与重塑；<br/>《小葱豆腐3神与伤》全知视角，她34岁开始，“一个世界”的危机与抉择。<br/>决定一切的，是源于苦难却不屈，基于理性却深怀仁爱，敢于爱也敢于创造，在尘埃中开花，并意图将花香铺满世界的——人格。",
-      book:"小葱豆腐三部曲",
-      name:"味界一梦：小葱豆腐三部曲",
     },
     {
       book:"小葱豆腐1人与奴",
       name:"我抵押了一辈子的自由",
       nation:"月荫",
       char:"李晓聪,张读,豆腐大院 等",
-      tab:"__未开放__【单女主&小刀大甜&甜宠&孩子&成长】"
     },
     {
       book:"小葱豆腐2压与纵",
       name:"从绑在朝堂柱子上开始",
       nation:"月荫",
       char:"张读,李晓聪,张訢 等",
-      tab:"__未开放__【单女主&小刀大甜&政治&战争&成长】"
     },
     {
       book:"小葱豆腐3神与伤",
-      name:"平等从未存在，唯有生存",
+      name:"冥冥生机，何处可掇",
       nation:"人界系",
       char:"张读,李晓聪,张锦儿,斗儿,匆儿,娲皇 等",
-      tab:"__未开放__【巨刀&庞大世界观&屠龙者终成恶龙】"
     },
     {
-      book:"夏虫不可语冰",
-      name:"穿越大搞平均主义，开局拐个小萝莉",
+      book:"夏虫不可语冰-冬夏",
+      name:"穿越：放出一只小萝莉",
       nation:"尔雪",
       char:"夏重,秋桃桃 等",
-      tab:"__未开放__【小刀x平均主义x单女主x魂穿穿书】"
+    },
+    {
+      book:"夏虫不可语冰-春秋",
+      name:"穿越：大搞平均主义",
+      nation:"尔雪",
+      char:"夏重,秋桃桃 等",
+      non:1
     },
     {
       book:"藻荇交横",
-      name:"世界不是一条条规矩，对吗",
+      name:"衡水中学的高级形式",
       nation:"炎炼",
       char:"藻,荇,枣,父上 等",
-      tab:"__未开放__【小刀x孩子x衡水中学式系统】"
     },
     {
       book:"宁静致远",
       name:"亡国公主与眼线玩伴的日常",
       nation:"燕兰,月荫",
       char:"陈宁,林叶静,张訢 等",
-      tab:"__未开放__<br/>【小刀x亡国公主x政治与恋爱x成长】"
     },
-    // {
-    //   book:"薇莱可欺",
-    //   name:"娶药引子当老婆",
-    //   nation:"胡天",
-    //   char:"胡莱,陆薇薇 等",
-    //   tab:"__未开放__【无刀&任性&半无敌&双向救赎】"
-    // },
-    // {
-    //   book:"蓬实莲华",
-    //   name:"我们很皮嘛？也许吧~",
-    //   nation:"月荫",
-    //   char:"张莲,张蓬 等",
-    //   tab:"__未开放__【小葱豆腐续作&魔丸&孩子&无敌】"
-    // },
-    // {
-    //   book:"泾渭分明",
-    //   name:"江北人，天生就是奴隶",
-    //   nation:"江域",
-    //   char:"",
-    //   tab:"__未开放__"
-    // },
+    {
+      book:"胡伏岂赦",
+      name:"糯糯不姓胡，糯糯姓胡奴",
+      nation:"月荫,胡天",
+      char:"胡奴糯糯,唐豆恩 等",
+    },
+    {
+      book:"仁不言二",
+      name:"且看我用礼制稳定国家",
+      nation:"月荫",
+      char:"张亻 等",
+      non:1
+    },
+    {
+      book:"未来可欺",
+      name:"她就是药引子？有点意思",
+      nation:"胡天",
+      char:"胡莱,陆薇儿 等",
+      non:1
+    },
+    {
+      book:"蓬实莲华",
+      name:"魔丸是我弟弟，我是魔花",
+      nation:"月荫",
+      char:"张莲,张蓬 等",
+      non:1
+    },
+    {
+      book:"吃苦是福",
+      name:"你叫不醒麻木的奴隶",
+      nation:"福苦",
+      char:"--",
+      non:1
+    },
+    {
+      book:"苦言",
+      name:"你叫不醒欲望的奴隶",
+      nation:"福苦",
+      char:"--",
+      non:1
+    },
+    {
+      book:"泾渭分明",
+      name:"一江之隔，泾渭分明",
+      nation:"江域",
+      char:"--",
+      non:1
+    },
     {
       book:"环游",
-      name:"爱旅游的神与味界游记",
+      name:"味界游记(世界观)",
       nation:"味界,人界系",
       char:"乎儿",
-      tab:"__未开放__<br/>从此进入以阅读，从“世界观”进入查询"
+      non:1
     },
     // {
     //   book:"",
     //   name:"",
     //   nation:"",
     //   char:"",
-    //   tab:""
-    // },
+    //   non:1
+    // }
+    ]
+    show=[
+      ["主推：小葱豆腐三部曲",["小葱豆腐1人与奴","小葱豆腐2压与纵","小葱豆腐3神与伤"]],
+      ["月荫·在大院里——",["大院里的小叶子","小葱豆腐1人与奴"]],
+      ["月荫·公奴制之后——",["宁静致远","胡伏岂赦","蓬实莲华"]],
+      ["没学完马原就不要穿越",["夏虫不可语冰-冬夏","夏虫不可语冰-春秋"]],
+      ["虐恋，并不甜",["小葱豆腐1人与奴","小葱豆腐2压与纵","夏虫不可语冰-冬夏","未来可欺"]]
+      // ["",["",""]],
     ]
   </script>
   
@@ -154,31 +184,43 @@
     else{
       document.querySelector("#lastRead").innerHTML=`<a href="javascript:lastRead()">${B+"("+localStorage.getItem(B)+"页)"}<br/>继续阅读&gt;</a>`
     }
-    // function updates(){
-    //   let localV=localStorage.getItem("V")
-    // }
     function lastRead(){
       location.href=`/text.html?b=${B}`
     }
-    function appendBook(mode=0){
+    var s2blist=Array(books.length);
+    for(let i=0;i<books.length;i++){s2blist[i]=books[i].book}
+    function getBookDiv(num){
+      let newBar=document.createElement("div");
+      let inHtml=`<b onclick=\"location.href=\'\/book.html?b=${books[num].book}\'\">${books[num].name}</b>`
+      if('non' in books[num]){inHtml="<span style='color:#666666'>"+inHtml+"</span>"};
+      inHtml+=`<hr/><div style="font-size:70%">《味界一梦：${books[num].book}》<br/>${books[num].nation} | ${books[num].char}<a href=\"javascript:location.href=`;
+      if(!('non' in books[num])){
+        if(localStorage.getItem(books[num].book) === null){
+          inHtml+=`\'\/book.html?b=${books[num].book}\'\"><br/>开始阅读&gt;</a></div>`
+        }else{
+          inHtml+=`\'\/text.html?b=${books[num].book}\'\"><br/>上次读到${localStorage.getItem(books[num].book)}页 继续阅读&gt;</a></div>`
+        }
+      }
+      newBar.innerHTML=inHtml
+      newBar.className="bars"
+      return newBar;
+    }
+    function showBooks(){
+      document.querySelector("#books").innerHTML="<br/>";
+      for(let i=0;i<show.length;i++){
+        document.querySelector("#books").appendChild(document.createElement("hr"));
+        let outBar=document.createElement("div");
+        outBar.innerHTML+=`<b style="display:block;padding:1.3rem 0 0">〇${show[i][0]}</b>`;
+        for(let j=0;j<show[i][1].length;j++){
+          outBar.appendChild(getBookDiv(s2blist.indexOf(show[i][1][j])));
+        }
+        document.querySelector("#books").appendChild(outBar);
+      }
+    }
+    function allBooks(){
       document.querySelector("#books").innerHTML="";
       for(let i=0;i<books.length;i++){
-      //   if(mode==2){
-      //     if('textMode' in books[i]){continue;}
-      //     document.querySelector("#books").innerHTML+=`<a href=\"javascript:location.href=\'\/${localStorage.getItem(book) === null?"book":"text"}.html?b=${book}\'\">${book}</a><br/>`
-      //     continue;
-      //   }
-        let book=mode?books[i].name:books[i].book;
-        let name=mode?"味界一梦："+books[i].book:books[i].name;
-        let newBar=document.createElement("div");
-        if('textMode' in books[i]){
-          newBar.innerHTML=`<b onclick=\"this.nextSibling.style.display=\'block\'\">${book} V</b><div style="font-size:70%;display:none">${books[i].textMode}</div>`
-        }else{
-          let inHtml=`<b onclick=\"location.href=\'\/book.html?b=${books[i].book}\'\">${book}</b><hr/><div style="font-size:70%">《${name}》<br/>${books[i].nation} | ${books[i].char}<br/>${books[i].tab}<a href=\"javascript:location.href=`;
-          if(localStorage.getItem(book) === null){newBar.innerHTML+=inHtml+`\'\/book.html?b=${book}\'\"><br/>开始阅读&gt;</a></div>`}else{newBar.innerHTML+=inHtml+`\'\/text.html?b=${book}\'\"><br/>上次读到${localStorage.getItem(book)}页 继续阅读&gt;</a></div>`}
-        }
-        newBar.className="bars";
-        document.querySelector("#books").appendChild(newBar);
+        document.querySelector("#books").appendChild(getBookDiv(i));
       }
     }
     window.addEventListener("message",(event)=>{
@@ -186,7 +228,7 @@
       if(event.data.listenAct=="start")window.top.postMessage({listenText:"欢迎回到味界一梦。您上次读到："+document.querySelector("#lastRead").textContent+"。进入阅读页面时将自动开始阅读！"});
       if(event.data.listenAct=="next")window.top.postMessage({listenAct:"stop"});
     })
-    window.onload=appendBook();
+    window.onload=showBooks();
   </script>
 </body>
 </html>

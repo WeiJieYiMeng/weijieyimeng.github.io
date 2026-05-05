@@ -98,18 +98,18 @@
   <div class="control-bar">
     <div class="btn-group">
       <button class="btn fontSize" title="调整字号">A<span>16</span></button>
-      <button class="btn lineHeight" title="调整行距">↕<span>1.1</span></button>
+      <button class="btn lineHeight" title="调整行距">L<span>1.1</span></button>
       <button class="btn paddingMode" title="边框模式">边</button>
     </div>
     <div class="btn-group" id="listenBar">
-      <button class="btn listenStart" title="开始收听" >▶</button>
+      <button class="btn listenStart" title="开始收听" >听</button>
       <button class="btn listenSpeed" style="display:none;font-size: 80%;" title="收听速度">1x</button>
-      <button class="btn listenStop" style="display: none;" title="停止收听">■</button>
+      <button class="btn listenStop" style="display: none;" title="停止收听">停</button>
     </div>
     <div class="btn-group">
-      <button class="btn chapterAlways" title="强制显示切换键">⚐</button>
-      <button class="btn darkMode" title="深浅切换">☽</button>
-      <button class="btn fullScreen" title="全屏模式">◱</button>
+      <button class="btn chapterAlways" title="强制显示切换键">B</button>
+      <button class="btn darkMode" title="深浅切换">D</button>
+      <button class="btn fullScreen" title="全屏模式">F</button>
     </div>
   </div>
   <main>
@@ -165,10 +165,10 @@
     //边框模式 1全 2去除外边框 3大全屏 4完全大全屏
     function uiPaddingMode(num){
       switch(num%4){
-        case 1:return "⚀";
-        case 2:return "⚁";
-        case 3:return "⚂";
-        case 0:return "⚃";
+        case 1:return "Ⅰ";
+        case 2:return "Ⅱ";
+        case 3:return "Ⅲ";
+        case 0:return "Ⅳ";
       }
     }
     var numPaddingMode= localStorage.getItem("paddingMode");
