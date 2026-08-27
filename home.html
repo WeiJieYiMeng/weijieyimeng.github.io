@@ -64,22 +64,31 @@
       char:"李晓聪,张读,豆腐大院 等",
     },
     {
+      book:"胡伏岂赦1",
+      name:"糯糯不姓胡，糯糯姓胡奴",
+      nation:"月荫,胡天",
+      char:"胡奴糯糯,唐豆恩 等",
+    },
+    {
       book:"小葱豆腐2压与纵",
       name:"从绑在朝堂柱子上开始",
       nation:"月荫",
       char:"张读,李晓聪,张訢 等",
+      non:1
     },
     {
       book:"小葱豆腐3神与伤",
       name:"冥冥生机，何处可掇",
       nation:"人界系",
       char:"张读,李晓聪,张锦儿,斗儿,匆儿,娲皇 等",
+      non:1
     },
     {
       book:"夏虫不可语冰-冬夏",
       name:"穿越：放出一只小萝莉",
       nation:"尔雪",
       char:"夏重,秋桃桃 等",
+      non:1
     },
     {
       book:"夏虫不可语冰-春秋",
@@ -89,71 +98,80 @@
       non:1
     },
     {
-      book:"藻荇交横",
-      name:"衡水中学的高级形式",
+      book:"雪山.雪衫",
+      name:"雪山.雪衫",
+      nation:"尔雪",
+      char:"冽夫,可琳娜 等",
+      non:1
+    },
+    {
+      book:"藻荇交横1",
+      name:"世界不是一场场仇恨，对吗？",
+      nation:"炎炼",
+      char:"藻,荇 等",
+      non:1
+    },
+    {book:"藻荇交横2",
+      name:"世界不是一条条规矩，对吗？",
       nation:"炎炼",
       char:"藻,荇,枣,父上 等",
+      non:1
     },
     {
       book:"宁静致远",
       name:"亡国公主与眼线玩伴的日常",
       nation:"燕兰,月荫",
       char:"陈宁,林叶静,张訢 等",
-    },
-    {
-      book:"胡伏岂赦",
-      name:"糯糯不姓胡，糯糯姓胡奴",
-      nation:"月荫,胡天",
-      char:"胡奴糯糯,唐豆恩 等",
+      non:1
     },
     {
       book:"仁不言二",
       name:"且看我用礼制稳定国家",
       nation:"月荫",
       char:"张亻 等",
-      non:1
+      non:0
     },
     {
       book:"未来可欺",
-      name:"她就是药引子？有点意思",
+      name:"她？本宫的药引子",
       nation:"胡天",
       char:"胡莱,陆薇儿 等",
-      non:1
+      non:0
     },
     {
       book:"蓬实莲华",
       name:"魔丸是我弟弟，我是魔花",
       nation:"月荫",
       char:"张莲,张蓬 等",
-      non:1
+      non:0
     },
     {
       book:"吃苦是福",
       name:"你叫不醒麻木的奴隶",
       nation:"福苦",
       char:"--",
-      non:1
+      non:0
     },
     {
       book:"苦言",
       name:"你叫不醒欲望的奴隶",
       nation:"福苦",
       char:"--",
-      non:1
+      non:0
     },
     {
       book:"泾渭分明",
       name:"一江之隔，泾渭分明",
       nation:"江域",
       char:"--",
-      non:1
+      non:0
     },
     {
       book:"环游",
       name:"味界游记(世界观)",
       nation:"味界,人界系",
       char:"乎儿",
-      non:1
+      non:0
     },
     // {
     //   book:"",
@@ -164,10 +182,12 @@
     // }
     ]
     show=[
-      ["主推：小葱豆腐三部曲",["小葱豆腐1人与奴","小葱豆腐2压与纵","小葱豆腐3神与伤"]],
+      ["现已推出——",["小葱豆腐1人与奴","大院里的小叶子","胡伏岂赦1"]],
       ["月荫·在大院里——",["大院里的小叶子","小葱豆腐1人与奴"]],
-      ["月荫·公奴制之后——",["宁静致远","胡伏岂赦","蓬实莲华"]],
+      ["小葱豆腐三部曲",["小葱豆腐1人与奴","小葱豆腐2压与纵","小葱豆腐3神与伤"]],
+      ["月荫·皇民之后——",["宁静致远","胡伏岂赦1","蓬实莲华"]],
       ["没学完马原就不要穿越",["夏虫不可语冰-冬夏","夏虫不可语冰-春秋"]],
+      ["衡水中学的高级形式",["藻荇交横1","藻荇交横2"]],
       ["虐恋，并不甜",["小葱豆腐1人与奴","小葱豆腐2压与纵","夏虫不可语冰-冬夏","未来可欺"]]
       // ["",["",""]],
     ]
@@ -192,16 +212,18 @@
     function getBookDiv(num){
       let newBar=document.createElement("div");
       let inHtml=`<b onclick=\"location.href=\'\/book.html?b=${books[num].book}\'\">${books[num].name}</b>`
-      if('non' in books[num]){inHtml="<span style='color:#666666'>"+inHtml+"</span>"};
-      inHtml+=`<hr/><div style="font-size:70%">《味界一梦：${books[num].book}》<br/>${books[num].nation} | ${books[num].char}<a href=\"javascript:location.href=`;
+      if('non' in books[num]){books[num].non?true: inHtml="<span style='color:#666666'>"+inHtml+"</span>" };
+      inHtml+=`<hr/><div style="font-size:70%">《味界一梦：${books[num].book}》<br/>${books[num].nation} | ${books[num].char}`;
       if(!('non' in books[num])){
         if(localStorage.getItem(books[num].book) === null){
-          inHtml+=`\'\/book.html?b=${books[num].book}\'\"><br/>开始阅读&gt;</a></div>`
+          inHtml+=`<a href=\"javascript:location.href=\'\/book.html?b=${books[num].book}\'\"><br/>开始阅读&gt;</a>`
         }else{
-          inHtml+=`\'\/text.html?b=${books[num].book}\'\"><br/>上次读到${localStorage.getItem(books[num].book)}页 继续阅读&gt;</a></div>`
+          inHtml+=`<a href=\"javascript:location.href=\'\/text.html?b=${books[num].book}\'\"><br/>上次读到${localStorage.getItem(books[num].book)}页 继续阅读&gt;</a>`
         }
+      }else{
+        inHtml+=books[num].non?"<a href=\"javascript:location.href=\'\/text.html?b=${books[num].book}\'\"><br/>本书仅简介</a>":"<br/>本书未开放";
       }
-      newBar.innerHTML=inHtml
+      newBar.innerHTML=inHtml+"</div>"
       newBar.className="bars"
       return newBar;
     }

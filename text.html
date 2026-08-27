@@ -95,9 +95,9 @@
     window.top.postMessage({loadMenu:bookname});
     window.addEventListener("message",(event)=>{
       if(event.origin!=location.origin)throw new Error("通信非同源");
-      if(event.data.menuLoaded==bookname)menuGot();
       if(event.data.listenAct=="start")window.top.postMessage({listenText:document.querySelector("#contentin").textContent});
       if(event.data.listenAct=="next")turnTo(lastC + 1);
+	  if(event.data.menuLoaded==bookname)menuGot();
     })
     var menu=null;
     function menuGot(){
@@ -106,11 +106,13 @@
     }
     var firstGetMenu=0;
     function getMenu(){
-      let leftC=menu[lastC - 1]||"已是第一章节";
-      let rightC=menu[lastC + 1]||"已是最后一章";
-      document.documentElement.style.setProperty('--turnLeft-property', `"${leftC}"`);
-      document.documentElement.style.setProperty('--turnRight-property', `"${rightC}"`);
-      if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到目录")},3150)}
+	    if(!firstGetMenu){setTimeout(()=>{firstGetMenu+=1;window.top.hint("点击左上角logo回到目录")},3150)}
+      setTimeout(()=>{
+        let leftC=menu[lastC - 1]||"已是第一章节";
+        let rightC=menu[lastC + 1]||"已是最后一章";
+        document.documentElement.style.setProperty('--turnLeft-property', `"${leftC}"`);
+        document.documentElement.style.setProperty('--turnRight-property', `"${rightC}"`);
+	    },1000)
     }
   </script>
 </body>
